@@ -1,0 +1,15 @@
+include:
+  - https://cpd.biw-pages.com/ci-includes/common/stages.yml
+  - https://cpd.biw-pages.com/ci-includes/common/variables.yml
+  - https://cpd.biw-pages.com/ci-includes/security/sast.yml
+
+deploy:
+  image: openjdk:11
+  dependencies: []
+  stage: publish
+  script:
+     - chmod +x gradlew
+     - ./gradlew publish -Pbranchname=master
+  only:
+    - master
+

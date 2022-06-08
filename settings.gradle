@@ -1,0 +1,8 @@
+rootProject.name = 'data-access'
+include 'data-access-api'
+include 'data-access-core'
+include 'data-access-http'
+include 'data-access-mq'
+include 'data-access-web'
+include 'data-access-api'
+
