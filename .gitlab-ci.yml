@@ -12,4 +12,3 @@ deploy:
      - ./gradlew publish -Pbranchname=master
   only:
     - master
-

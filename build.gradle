@@ -1,11 +1,3 @@
-plugins {
-    id 'java'
-    id 'maven-publish'
-}
-
-group 'com.biw.asg.da'
-version '1.0.0'
-
 String projectProperty(String key, String defaultValue = "") {
     if ( project.hasProperty( key ) ) {
         return project.getProperty( key )
@@ -28,35 +20,44 @@ else
     ext.gitLabCredentialsValue = System.getenv("CI_JOB_TOKEN")
 }
 
-repositories {
-    mavenLocal()
-    mavenCentral()
-    maven {
-        url 'https://gitlab.biw-services.com/api/v4/groups/1735/-/packages/maven'
-        credentials(HttpHeaderCredentials) {
-            name = gitLabCredentialsName
-            value = gitLabCredentialsValue
-        }
-        authentication {
-            header(HttpHeaderAuthentication)
-        }
-    }
-}
-
-dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.2'
-}
-
-test {
-    useJUnitPlatform()
-}
-
 subprojects {
     apply plugin: 'maven-publish'
-    publishing {
-        publications {
-            mavenJava(MavenPublication) {
+    apply plugin: 'java'
+    apply plugin: 'java-library'
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven {
+            url 'https://gitlab.biw-services.com/api/v4/groups/1735/-/packages/maven'
+            credentials(HttpHeaderCredentials) {
+                name = gitLabCredentialsName
+                value = gitLabCredentialsValue
+            }
+            authentication {
+                header(HttpHeaderAuthentication)
+            }
+        }
+    }
+
+    project.afterEvaluate {
+        publishing {
+            repositories {
+                maven {
+                    url "https://gitlab.biw-services.com/api/v4/projects/4944/packages/maven"
+                    credentials(HttpHeaderCredentials) {
+                        name = gitLabCredentialsName
+                        value = gitLabCredentialsValue
+                    }
+                    authentication {
+                        header(HttpHeaderAuthentication)
+                    }
+                }
+            }
+            publications {
+                mavenJava(MavenPublication) {
+                    from components.java
+                }
             }
         }
     }
