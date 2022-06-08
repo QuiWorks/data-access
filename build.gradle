@@ -1,12 +1,46 @@
 plugins {
     id 'java'
+    id 'maven-publish'
 }
 
 group 'com.biw.asg.da'
 version '1.0.0'
 
+String projectProperty(String key, String defaultValue = "") {
+    if ( project.hasProperty( key ) ) {
+        return project.getProperty( key )
+    }
+    else {
+        return System.getenv( key ) ?: defaultValue
+    }
+}
+
+// Gitlab credentials
+// Private token for dev machines, CI token for CI runners
+if ( project.hasProperty( 'gitLabPrivateToken' ) )
+{
+    ext.gitLabCredentialsName = "Private-Token"
+    ext.gitLabCredentialsValue = projectProperty( 'gitLabPrivateToken' )
+}
+else
+{
+    ext.gitLabCredentialsName  = "Job-Token"
+    ext.gitLabCredentialsValue = System.getenv("CI_JOB_TOKEN")
+}
+
 repositories {
+    mavenLocal()
     mavenCentral()
+    maven {
+        url 'https://gitlab.biw-services.com/api/v4/groups/1735/-/packages/maven'
+        credentials(HttpHeaderCredentials) {
+            name = gitLabCredentialsName
+            value = gitLabCredentialsValue
+        }
+        authentication {
+            header(HttpHeaderAuthentication)
+        }
+    }
 }
 
 dependencies {
@@ -16,4 +50,12 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
 }
