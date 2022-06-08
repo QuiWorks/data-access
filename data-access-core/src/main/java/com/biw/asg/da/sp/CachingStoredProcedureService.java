@@ -26,7 +26,7 @@ public class CachingStoredProcedureService extends JdbcTemplateStoredProcedureSe
 
         loadingCache = CacheBuilder.newBuilder()
             .expireAfterAccess( 12, TimeUnit.HOURS)
-            .build(new CacheLoader<>() {
+            .build(new CacheLoader<String, StoredProcedureCall>() {
                 @Override
                 public StoredProcedureCall load(final String packageAndName) {
                     String[] split = packageAndName.split( "\\." );
