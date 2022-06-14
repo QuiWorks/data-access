@@ -1,6 +1,8 @@
 package com.biw.asg.da.sp;
 
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.SqlOutParameter;
@@ -55,13 +57,17 @@ public class JdbcTemplateStoredProcedureService implements StoredProcedureServic
     public static class StoredProcedureCallImpl extends StoredProcedure  implements StoredProcedureCall {
 
         private final Set<StoredProcedureParameter> inputParameters = new HashSet<>();
-        private final ObjectMapper objectMapper = new ObjectMapper();
+        private final ObjectMapper objectMapper;
         private final String name;
 
         public StoredProcedureCallImpl( DataSource ds, String name, List<StoredProcedureParameter> parameters )
         {
             super( ds, name );
             this.name = name;
+
+            objectMapper = JsonMapper.builder()
+                .configure( MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true )
+                .build();
 
             parameters.stream()
                 .filter( StoredProcedureParameter::isInput )
