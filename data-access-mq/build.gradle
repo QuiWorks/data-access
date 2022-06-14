@@ -1,5 +1,5 @@
 group 'com.biw.asg.da'
-version '1.0.0'
+version '1.0.1'
 
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.2'
