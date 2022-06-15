@@ -1,10 +1,12 @@
 package com.biw.asg.da.sp;
 
+import com.biw.asg.da.OracleType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.jdbc.object.StoredProcedure;
 
 import java.sql.Types;
+import java.util.Optional;
 
 /**
  * Represents a single stored procedure parameter.
@@ -40,20 +42,14 @@ public class StoredProcedureParameter
     /**
      * Converts a type label provided by the DB
      * to an integer which is needed by {@link StoredProcedure}
+     *
      * @return an integer representing the parameter's data type.
      */
     public int getDataTypeAsInteger()
     {
-        switch ( this.dataType )
-        {
-            case "NUMBER":
-                return Types.NUMERIC;
-            case "REF CURSOR":
-                return -10;
-            case "VARCHAR2":
-            default:
-                return Types.VARCHAR;
-        }
+        return OracleType.of( this.dataType )
+            .map( OracleType::getCode )
+            .orElseThrow( () -> new RuntimeException( "Unable to find type code for type '" + this.dataType + "'" ) );
     }
 
 }

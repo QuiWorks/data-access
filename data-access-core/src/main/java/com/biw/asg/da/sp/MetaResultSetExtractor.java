@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 /**
  * A {@link ResultSetExtractor} for mapping SQL reference cursors.
@@ -26,23 +27,10 @@ public class MetaResultSetExtractor implements ResultSetExtractor<List<Map<Strin
             Map<String, Object> record = new HashMap<>();
             for( int i = 1; i < metaData.getColumnCount() + 1; i++ )
             {
-                switch ( metaData.getColumnTypeName( i ) )
-                {
-                    case "NUMBER":
-                        record.put( metaData.getColumnName( i ), rs.getInt( i ) );
-                        break;
-                    case "CLOB":
-                    case "VARCHAR2":
-                        record.put( metaData.getColumnName( i ), rs.getString( i ) );
-                        break;
-                    default:
-                        record.put( metaData.getColumnName( i ), rs.getObject( i ) );
-                        break;
-                }
+                record.put( metaData.getColumnName( i ), rs.getObject( i ));
             }
             list.add( record );
         }
         return list;
     }
-
 }

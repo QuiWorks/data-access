@@ -54,7 +54,8 @@ public class JdbcTemplateStoredProcedureService implements StoredProcedureServic
         return storedProcedureCall;
     }
 
-    public static class StoredProcedureCallImpl extends StoredProcedure  implements StoredProcedureCall {
+    public static class StoredProcedureCallImpl extends StoredProcedure  implements StoredProcedureCall
+    {
 
         private final Set<StoredProcedureParameter> inputParameters = new HashSet<>();
         private final ObjectMapper objectMapper;
