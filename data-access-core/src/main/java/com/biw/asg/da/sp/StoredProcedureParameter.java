@@ -5,9 +5,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.jdbc.object.StoredProcedure;
 
-import java.sql.Types;
-import java.util.Optional;
-
 /**
  * Represents a single stored procedure parameter.
  */

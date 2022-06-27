@@ -1,15 +1,17 @@
 package com.biw.asg.da;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLType;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiFunction;
 
 public enum OracleType implements SQLType {
     VARCHAR2("VARCHAR2", 12),
-    NVARCHAR("NVARCHAR", -9, true),
+    NVARCHAR("NVARCHAR", -9),
     NUMBER("NUMBER", 2),
     FLOAT("FLOAT", 6),
     LONG("LONG", -1),
@@ -27,9 +29,19 @@ public enum OracleType implements SQLType {
     ROWID("ROWID", -8),
     UROWID("UROWID"),
     CHAR("CHAR", 1),
-    NCHAR("NCHAR", -15, true),
-    CLOB("CLOB", 2005),
-    NCLOB("NCLOB", 2011, true),
+    NCHAR("NCHAR", -15),
+    CLOB( "CLOB", 2005, (rs, i) -> {
+        try
+        {
+            return rs.getString( i );
+        }
+        catch( SQLException e )
+        {
+            e.printStackTrace();
+            return null;
+        }
+    } ),
+    NCLOB("NCLOB", 2011),
     BLOB("BLOB", 2004),
     BFILE("BFILE", -13),
     JSON("JSON", 2016),
@@ -61,10 +73,9 @@ public enum OracleType implements SQLType {
     SI_TEXTURE("SI_TEXTURE"),
     REF_CURSOR("REF CURSOR", -10);
 
-    private final boolean isSupported;
     private final String typeName;
     private final int code;
-    private final boolean isNationalCharacterSet;
+    private BiFunction<ResultSet, Integer, Object> accessor;
 
     public static OracleType toOracleType(SQLType var0) throws SQLException {
         return var0 instanceof OracleType ? (OracleType)var0 : null;
@@ -94,24 +105,33 @@ public enum OracleType implements SQLType {
     }
 
     OracleType(String var3) {
-        this.isSupported = false;
-        this.typeName = var3;
-        this.code = -2147483648;
-        this.isNationalCharacterSet = false;
+        this(var3, -2147483648);
     }
 
     OracleType(String var3, int var4) {
-        this.isSupported = true;
-        this.typeName = var3;
-        this.code = var4;
-        this.isNationalCharacterSet = false;
+        this(var3, var4, (rs, i) -> {
+            try
+            {
+                return rs.getObject( i );
+            }
+            catch( SQLException e )
+            {
+                e.printStackTrace();
+                return null;
+            }
+        } );
     }
 
-    OracleType(String var3, int var4, boolean var5) {
-        this.isSupported = true;
-        this.typeName = var3;
-        this.code = var4;
-        this.isNationalCharacterSet = var5;
+
+    OracleType( String typeName, int code, BiFunction<ResultSet, Integer, Object> accessor ) {
+        this.typeName = typeName;
+        this.code = code;
+        this.accessor = accessor;
+    }
+
+    public BiFunction<ResultSet, Integer, Object> getAccessor()
+    {
+        return accessor;
     }
 
     public String getName() {
@@ -129,14 +149,6 @@ public enum OracleType implements SQLType {
 
     public Integer getVendorTypeNumber() {
         return this.code;
-    }
-
-    public boolean isNationalCharacterSet() {
-        return this.isNationalCharacterSet;
-    }
-
-    public boolean isSupported() {
-        return this.isSupported;
     }
 
 }

@@ -1,5 +1,5 @@
 group 'com.biw.asg.da'
-version '1.0.2'
+version '1.0.3'
 
 dependencies {
     api(project(":data-access-api"))
